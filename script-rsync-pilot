@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DATADIR=d2
+
+if [ "$1" == "" ] ; then
+  echo The hostname parmeter DOES NOT exist
+  echo "Usage: script-rsync-data <hostname.local>"
+  exit
+else
+  ping -c 1 $1
+  if [ ! $? == 0 ] ; then
+    echo $1 Not Found! 
+    echo Please recheck the spelling or verify both devices are on the same wireless network. 
+    exit
+  fi
+fi
+
+if [ ! -d $HOME/$DATADIR ] ; then
+  echo The local directory, $HOME/$DATADIR does NOT exist!
+  echo script-createcar should be run before attempting to copy rPi pilot here.
+  exit
+fi
+
+
+rsync -ah --progress $HOME/$DATADIR/models pi@$1:$DATADIR

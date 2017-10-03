@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# create standard car directories on the local computer(not the rPi)
+cd ~
+donkey createcar --template donkey2 --path ~/d2 --overwrite
+

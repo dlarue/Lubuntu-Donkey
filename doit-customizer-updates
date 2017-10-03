@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#
+# install donkey as donkeycar
+#
+LHOME=/home/lubuntu
+DOWNLOADS=/home/lubuntu/Downloads
+IMG=$HOME/Projects/DIYRoboCar/Donkey/donkey_2.img.zip
+IMG=donkey_2.img.zip
+IMGSRC=https://www.dropbox.com/s/vb9wlju4aqx7i5o/donkey_2.img.zip
+
+wget $IMGSRC
+sudo mv $IMG FileSystem/$DOWNLOADS
+sudo cp bashrc FileSystem/$LHOME/.bashrc
+sudo cp wpa_supplicant.conf FileSystem/$DOWNLOADS
+sudo cp wlan0.conf FileSystem/$DOWNLOADS
+sudo cp sixpair.c FileSystem/$DOWNLOADS
+
+sudo tar -xf mozBackup.tgz -C FileSystem/$LHOME
+sudo mkdir FileSystem/$LHOME/Desktop
+sudo cp *.desktop FileSystem/$LHOME/Desktop
+sudo cp HowToDonkeyCar.pdf FileSystem/$LHOME/Desktop
+
+sudo cp timezone FileSystem/etc/timezone
+
+#cp FileSystem/usr/share/zoneinfo/America/Los_Angeles FileSystem/etc/localtime 
+#timedatectl set-timezone "America/Los_Angeles"
+
+sudo mkdir FileSystem/$LHOME/bin
+sudo cp script-* FileSystem/$LHOME/bin
+sudo chmod +x FileSystem/$LHOME/bin/*
+
+sudo mkdir FileSystem/$LHOME/Documents
+sudo cp lubuntu-default-wallpaper.png FileSystem/$LHOME/Documents
+sudo tar -xzf desktopConfig.tgz -C FileSystem/$LHOME
+
+sudo chown -R 999:999 FileSystem/home/lubuntu
+

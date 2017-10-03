@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+apt-get update \
+	&& apt-get -qqy upgrade 
+apt-get install -qqy \
+	git wget pv virtualenv nmap avahi-utils
+apt-get install -qqy \
+	linux-firmware-nonfree b43-fwcutter firmware-b43-installer
+apt-get clean
+apt-get -qqy autoremove 
+
+#
+# setup timezone
+#
+rm -rf /etc/localtime
+ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime 
+
+#
+# install donkey as donkeycar
+#
+mkdir /home/lubuntu
+mkdir /home/lubuntu/Downloads
+cd /home/lubuntu
+virtualenv env -p python3
+source env/bin/activate
+git clone https://github.com/wroscoe/donkey donkeycar
+pip install -e donkeycar
+pip install Keras==2.0.6
+pip install tensorflow==1.1.0
+
+
+sudo chown -R 999:999 /home/lubuntu
+

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$1" == "" ] ; then
+  echo The hostname parmeter DOES NOT exist
+  echo "Usage: script-remote-createcar <hostname.local>"
+  exit
+else
+  ping -c 1 $1
+  if [ ! $? == 0 ] ; then
+    echo $1 Not Found! 
+    echo Please recheck the spelling or verify both devices are on the same wireless network. 
+    exit
+  fi
+fi
+
+#
+# create standard car using web interface for remote control
+CMD="donkey createcar --template donkey2 --path ~/d2 --overwrite"
+
+ssh pi@$1 -t "source /home/pi/env/bin/activate; $CMD" 

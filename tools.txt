@@ -1,0 +1,1 @@
+python manage.py analyze --op=histogram --rec="user/angle"
