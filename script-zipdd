@@ -19,18 +19,24 @@ if [ "$2" == "" ] ; then
   echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname>"
   exit
 fi
+if [ ! "$3" == "" ] ; then
+  echo 'USING Alternate Device '$3
+  SDDEVICE=$3
+else
+  SDDEVICE=mmcblk0
+fi
 echo 'PASSED - Parameter check'
 
 echo 'Checking for previously mounted uSD'
 # checking for uSD card
-ls /dev/mmcblk0 > /dev/null 2>&1
+ls /dev/${SDDEVICE} > /dev/null 2>&1
 if [ $? == 0 ] ; then
-  if grep mmcblk0 /etc/mtab > /dev/null 2>&1 ; then
-    IS_MOUNTED=`df | grep mmcblk0`
+  if grep ${SDDEVICE} /etc/mtab > /dev/null 2>&1 ; then
+    IS_MOUNTED=`df | grep ${SDDEVICE}`
     if [ $? == 0 ] ; then
       #echo 'test: $IS_MOUNTED'
       #echo 'test: unmounting partitions'
-      sudo umount /dev/mmcblk0p*
+      sudo umount /dev/${SDDEVICE}*
       if [ ! $? == 0 ] ; then
         echo 'FAIL - Unable to unmount the uSD card'
         exit
@@ -64,7 +70,7 @@ echo and you see COPY DONE before ejecting
 
 IMAGE_SIZE=`unzip -l ~/Downloads/donkey_2.img.zip | grep donkey | tail -n 1 | cut -f1 -d" "`
 
-unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/mmcblk0 bs=1M
+unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
 sync
 
 echo COPY DONE
@@ -73,8 +79,13 @@ echo Setting up Customizations
 sudo partprobe # reloads partition tables
 
 mkdir mnt1 mnt2
-sudo mount /dev/mmcblk0p1 mnt1
-sudo mount /dev/mmcblk0p2 mnt2
+if ( ${SDDEVICE} == "mmcblk0" ) ; then
+  sudo mount /dev/${SDDEVIcE}p1 mnt1
+  sudo mount /dev/${SDDEVIcE}p2 mnt2
+else
+  sudo mount /dev/${SDDEVICE}1 mnt1
+  sudo mount /dev/${SDDEVICE}2 mnt2
+fi
 
 #echo Setting up new hostname
 echo $2 | sudo tee mnt2/etc/hostname
