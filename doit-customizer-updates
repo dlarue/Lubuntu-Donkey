@@ -9,7 +9,9 @@ IMG=$HOME/Projects/DIYRoboCar/Donkey/donkey_2.img.zip
 IMG=donkey_2.img.zip
 IMGSRC=https://www.dropbox.com/s/vb9wlju4aqx7i5o/donkey_2.img.zip
 
-wget $IMGSRC
+if [ ! -f $IMG ] ; then
+  wget $IMGSRC
+fi
 sudo mv $IMG FileSystem/$DOWNLOADS
 sudo cp bashrc FileSystem/$LHOME/.bashrc
 sudo cp wpa_supplicant.conf FileSystem/$DOWNLOADS
