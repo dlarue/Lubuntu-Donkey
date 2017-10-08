@@ -26,8 +26,10 @@ virtualenv env -p python3
 source env/bin/activate
 git clone https://github.com/wroscoe/donkey donkeycar
 pip install -e donkeycar
-pip install Keras==2.0.6
-pip install tensorflow==1.1.0
+#pip install Keras==2.0.6
+#pip install tensorflow==1.1.0
+pip install Keras
+pip install tensorflow
 
 
 sudo chown -R 999:999 /home/lubuntu
