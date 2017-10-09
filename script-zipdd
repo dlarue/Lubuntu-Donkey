@@ -23,7 +23,7 @@ if [ ! "$3" == "" ] ; then
   echo 'USING Alternate Device '$3
   SDDEVICE=$3
 else
-  SDDEVICE=mmcblk0
+  SDDEVICE="mmcblk0"
 fi
 echo 'PASSED - Parameter check'
 
@@ -82,9 +82,9 @@ echo Setting up Customizations
 sudo partprobe # reloads partition tables
 
 mkdir mnt1 mnt2
-if ( ${SDDEVICE} == "mmcblk0" ) ; then
-  sudo mount /dev/${SDDEVIcE}p1 mnt1
-  sudo mount /dev/${SDDEVIcE}p2 mnt2
+if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+  sudo mount /dev/${SDDEVICE}p1 mnt1
+  sudo mount /dev/${SDDEVICE}p2 mnt2
 else
   sudo mount /dev/${SDDEVICE}1 mnt1
   sudo mount /dev/${SDDEVICE}2 mnt2
