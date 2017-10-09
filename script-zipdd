@@ -36,7 +36,11 @@ if [ $? == 0 ] ; then
     if [ $? == 0 ] ; then
       #echo 'test: $IS_MOUNTED'
       #echo 'test: unmounting partitions'
-      sudo umount /dev/${SDDEVICE}*
+      if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+        sudo umount /dev/${SDDEVICE}p*
+      else
+        sudo mount /dev/${SDDEVICE}*
+      fi
       if [ ! $? == 0 ] ; then
         echo 'FAIL - Unable to unmount the uSD card'
         exit
@@ -67,7 +71,7 @@ sed -i s/your-network-name/$MYSSID/g ~/Downloads/wpa_supplicant.conf.NEW
 sed -i s/your-passphrase/$MYPWD/g ~/Downloads/wpa_supplicant.conf.NEW
 #sed -i s/track/$2/g ~/Downloads/wpa_supplicant.conf.NEW
 
-echo BUILDING your DonkeyCar iamge. Please Wait......
+echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
