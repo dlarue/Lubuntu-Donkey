@@ -3,7 +3,7 @@
 echo 'Checking for parameters'
 if [ "$1" == "" ] ; then
   #echo :$1: parm DOES NOT exist
-  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname>"
+  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
   exit
 else
   #echo :$1: parm exists
@@ -16,7 +16,7 @@ fi
 
 if [ "$2" == "" ] ; then
   echo 'FAIL - The Second parameter DOES NOT exist'
-  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname>"
+  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
   exit
 fi
 if [ ! "$3" == "" ] ; then
