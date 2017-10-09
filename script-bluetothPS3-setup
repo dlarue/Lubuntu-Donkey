@@ -4,7 +4,7 @@ DONKEYDIR=d2
 
 if [ "$1" == "" ] ; then
   echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-setup-bluetooth <your-hostname.local>"
+  echo "Usage: script-bluetoothPS3-setup <your-hostname.local>"
   exit
 else
   ping -c 1 $1
