@@ -55,9 +55,9 @@ echo These will be used to populate the wpa_supplicant.conf file in
 echo your Downloads directory and copied to /media/lubuntu/boot.
 echo On startup, the raspberryPi will copy that into the netwok and use it.
 echo -------------- Setting up WiFi --------------------------------------
-echo -n "Enter your Wifi SSID: "
-read MYSSID
-echo -n "Enter your Wifi Passphrase: "
+FOUNDSSID=`iwgetid -r`
+read -e -p "Enter Your WiFi SSID:" -i $FOUNDSSID MYSSID
+echo -n "Enter your WiFi Passphrase: "
 read MYPWD
 cp ~/Downloads/wpa_supplicant.conf ~/Downloads/wpa_supplicant.conf.NEW
 sed -i s/your-network-name/$MYSSID/g ~/Downloads/wpa_supplicant.conf.NEW
