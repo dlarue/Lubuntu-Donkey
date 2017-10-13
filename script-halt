@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DONKEYDIR=d2
+
+if [ "$1" == "" ] ; then
+  echo The hostname parmeter DOES NOT exist
+  echo "Usage: script-halt <hostname.local>"
+  exit
+else
+  ping -c 1 $1
+  if [ ! $? == 0 ] ; then
+    echo $1 Not Found! 
+    echo Please recheck the spelling or verify both devices are on the same wireless network. 
+    exit
+  fi
+fi
+
+ssh pi@$1 "sudo halt </dev/null >/dev/null 2>&1 &" 
