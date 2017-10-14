@@ -1,25 +1,30 @@
 #!/bin/bash
 
-DATADIR=d2
+DONKEYDIR=d2
 
 if [ "$1" == "" ] ; then
-  echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-rsync-data <hostname.local>"
-  exit
+  SRCDIR=$(dirname $0)
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
 else
-  ping -c 1 $1
-  if [ ! $? == 0 ] ; then
-    echo $1 Not Found! 
-    echo Please recheck the spelling or verify both devices are on the same wireless network. 
-    exit
-  fi
+  myHostNameLocal=$1
+fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  echo Please recheck the spelling or verify both devices are on the same wireless network. 
+  echo "Usage: script-rsync-data [hostname.local]"
+  exit
 fi
 
-if [ ! -d $HOME/$DATADIR ] ; then
+echo 'PASSED - Parameter checks'
+
+
+if [ ! -d $HOME/$DONKEYDIR ] ; then
   echo The local directory, $HOME/$DATADIR does NOT exist!
-  echo script-createcar should be run before attempting to copy rPi data here.
+  echo script-local-createcar should be run before attempting to copy rPi data here.
   exit
 fi
 
 
-rsync -ah --progress pi@$1:$DATADIR/data $HOME/$DATADIR
+rsync -ah --progress pi@$myHostNameLocal:$DONKEYDIR/data $HOME/$DONKEYDIR

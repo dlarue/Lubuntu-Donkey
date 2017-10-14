@@ -3,21 +3,22 @@
 DONKEYDIR=d2
 
 if [ "$1" == "" ] ; then
-  echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-drive <hostname.local>"
-  exit
+  SRCDIR=$(dirname $0)
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
 else
-  ping -c 1 $1
-  if [ ! $? == 0 ] ; then
-    echo $1 Not Found! 
-    echo Please recheck the spelling or verify both devices are on the same wireless network. 
-    exit
-  fi
+  myHostNameLocal=$1
 fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  echo Please recheck the spelling or verify both devices are on the same wireless network. 
+  echo "Usage: script-auto-drive [hostname.local]"
+  exit
+fi
+
+echo 'PASSED - Parameter checks'
 
 #
 # for autonomous driving
-ssh pi@$1 -t "source env/bin/activate; cd; cd d2; python ./manage.py drive --model=./models/myPilot" 
-#
-# using PS3 Joystick
-#ssh pi@$1 -t "source env/bin/activate; cd; cd d2; python ./manage.py drive --model=./models/myPilot --js" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; cd; cd d2; python ./manage.py drive --model=./models/myPilot" 

@@ -3,33 +3,29 @@
 DONKEYDIR=d2
 
 if [ "$1" == "" ] ; then
-  echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-bluetoothPS3-setup <your-hostname.local>"
-  exit
+  SRCDIR=$(dirname $0)
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
 else
-  ping -c 1 $1
-  if [ ! $? == 0 ] ; then
-    echo $1 Not Found! 
-    echo Please recheck the spelling or verify both devices are on the same wireless network. 
-    exit
-  fi
+  myHostNameLocal=$1
+fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  echo Please recheck the spelling or verify both devices are on the same wireless network. 
+  echo "Usage: script-bluetoothPS3-setup [your-hostname.local]"
+  exit
 fi
 
-if [ "$2" == "" ] ; then
-  echo The Second parameter DOES NOT exist
-  echo Replacing d2 with upgraded d2
-  echo Any previoud d2/data and d2/models will be moved to the new d2 
-else
-  DONKEYDIR=$2
-fi
-echo 'PASSED - Parameter check'
+echo 'PASSED - Parameter checks'
 
 #
 # TODO: add checks for customizations to Config.py and manage.py
 #
 # updating rPi Donkey software
-ssh pi@$1 -t "source env/bin/activate; sudo apt-get install -qqy bluetooth libbluetooth3 libusb-dev; sudo usermod -G bluetooth -a pi; gcc -o sixpair sixpair.c -lusb; sudo systemctl enable bluetooth.service; sudo systemctl restart bluetooth; echo 'Halting! Remove/replace power and ssh into the rPi, then run the bluetoothctl commands'; sudo halt" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; sudo apt-get install -qqy bluetooth libbluetooth3 libusb-dev; sudo usermod -G bluetooth -a pi; gcc -o sixpair sixpair.c -lusb; sudo systemctl enable bluetooth.service; sudo systemctl restart bluetooth; echo 'Halting! Remove/replace power and ssh into the rPi, then run the bluetoothctl commands'; sudo halt" 
 
+#from: https://pythonhosted.org/triangula/sixaxis.html
 echo "example:"
 echo "bluetoothctl"
 echo "  > plug in PS3 controller"
@@ -37,22 +33,4 @@ echo "  > agent on"
 echo "  > trust ps3_device_mac_id"
 echo "  > quit"
 exit 
-#from: https://pythonhosted.org/triangula/sixaxis.html
-sudo apt-get install bluetooth libbluetooth3 libusb-dev
-sudo usermod -G bluetooth -a pi
-reboot
-wget http://www.pabr.org/sixlinux/sixpair.c
-gcc -o sixpair sixpair.c -lusb
-  > plug in the PS3 controller
-sudo ./sixpair
-sudo systemctl enable bluetooth.service
-bluetoothctl
-  > plug in PS3 controller
-  > agent on
-  > trust device_mac_id
-  > quit
-#sudo /etc/init.d/bluetooth restart
-sudo reboot & exit
-ls /dev/input/
-  > /dev/input/js0
 

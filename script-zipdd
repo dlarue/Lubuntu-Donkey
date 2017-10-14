@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASEDIR=$(dirname $0)
+
 echo 'Checking for parameters'
 if [ "$1" == "" ] ; then
   #echo :$1: parm DOES NOT exist
@@ -18,6 +20,9 @@ if [ "$2" == "" ] ; then
   echo 'FAIL - The Second parameter DOES NOT exist'
   echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
   exit
+else
+  # set config entry myHostName for other scripts usage
+  sed -i s/myHostName=.*/myHostName=\"$2\"/g $BASEDIR/script-config
 fi
 if [ ! "$3" == "" ] ; then
   echo 'USING Alternate Device '$3
@@ -71,6 +76,9 @@ sed -i s/your-network-name/$MYSSID/g ~/Downloads/wpa_supplicant.conf.NEW
 sed -i s/your-passphrase/$MYPWD/g ~/Downloads/wpa_supplicant.conf.NEW
 #sed -i s/track/$2/g ~/Downloads/wpa_supplicant.conf.NEW
 
+# set config entry mySSID for reference
+sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config
+
 echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
@@ -102,6 +110,15 @@ sudo sed -i s/raspberrypi/$2/g mnt2/etc/hosts
 sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt2/etc/wpa_supplicant/wpa_supplicant.conf
 sudo cp ~/Downloads/wlan0.conf mnt2/etc/network/interfaces.d/
 sudo cp ~/Downloads/sixpair.c mnt2/home/pi/
+
+#auto ssh login
+# This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+ssh-keygen -f ~/.ssh/id_rsa -N ""
+#
+# Move id_rsa.pub to rPi, or use ssh-copy-id -i ~/.ssh/id_rsa pi@your-hostname.local 
+sudo mkdir mnt2/home/pi/.ssh
+sudo mv ~/.ssh/id_rsa.pub mnt2/home/pi/.ssh/authorized_keys
+sudo chown -R 1000:1000 mnt2/home/pi/.ssh
 
 sudo sync && sudo umount mnt1 mnt2
 rm -rf mnt1 mnt2

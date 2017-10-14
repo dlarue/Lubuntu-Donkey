@@ -1,0 +1,34 @@
+#!/bin/bash
+
+DONKEYDIR=d2
+BASEDIR=$(dirname $0)
+SRCDIR=$(dirname $0)
+
+if [ "$1" == "" ] ; then
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
+else
+  myHostNameLocal=$1
+fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  FOUNDHOSTNAME=$myHostName
+  read -e -p "Enter Your rPi Hostname:" -i $FOUNDHOSTNAME MYHOSTNAME
+
+  # set config entry myHostName for other scripts usage
+  sed -i s/myHostName=.*/myHostName=\"$MYHOSTNAME\"/g $BASEDIR/script-config
+  source $SRCDIR/script-config
+  #echo "Usage: script-reauthorize-ssh [hostname.local]"
+  #exit
+fi
+
+echo 'PASSED - Parameter checks'
+
+#auto ssh login
+# This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+echo "answer yes to Overwriting existing file"
+ssh-keygen -f ~/.ssh/id_rsa -N ""
+#
+# Move id_rsa.pub to rPi, or use ssh-copy-id -i ~/.ssh/id_rsa pi@your-hostname.local 
+ssh-copy-id -i ~/.ssh/id_rsa pi@$myHostNameLocal

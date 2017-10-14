@@ -3,30 +3,25 @@
 DONKEYDIR=d2
 
 if [ "$1" == "" ] ; then
-  echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-rpi-donkeyUpgrade <hostname.local> [d2=default driver directory]"
-  exit
+  SRCDIR=$(dirname $0)
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
 else
-  ping -c 1 $1
-  if [ ! $? == 0 ] ; then
-    echo $1 Not Found! 
-    echo Please recheck the spelling or verify both devices are on the same wireless network. 
-    exit
-  fi
+  myHostNameLocal=$1
+fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  echo Please recheck the spelling or verify both devices are on the same wireless network. 
+  echo "Usage: script-rpi-donkeyUpgrade [hostname.local]"
+  exit
 fi
 
-if [ "$2" == "" ] ; then
-  echo The Second parameter DOES NOT exist
-  echo Replacing d2 with upgraded d2
-  echo Any previoud d2/data and d2/models will be moved to the new d2 
-else
-  DONKEYDIR=$2
-fi
-echo 'PASSED - Parameter check'
+echo 'PASSED - Parameter checks'
 
 #
 # TODO: add checks for customizations to Config.py and manage.py
 #
 # updating rPi Donkey software
-ssh pi@$1 -t "source env/bin/activate; cd donkeycar && git pull && pip install -e . && cd ; if [ -d ${DONKEYDIR}ORG ]; then rm -rf ${DONKEYDIR}ORG; fi; mv ${DONKEYDIR} ${DONKEYDIR}ORG ; donkey createcar --path=${DONKEYDIR} && mv ${DONKEYDIR}ORG/models/* ${DONKEYDIR}/models && mv ${DONKEYDIR}ORG/data/* ${DONKEYDIR}/data" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; cd donkeycar && git pull && pip install -e . && cd ; if [ -d ${DONKEYDIR}ORG ]; then rm -rf ${DONKEYDIR}ORG; fi; mv ${DONKEYDIR} ${DONKEYDIR}ORG ; donkey createcar --path=${DONKEYDIR} && mv ${DONKEYDIR}ORG/models/* ${DONKEYDIR}/models && mv ${DONKEYDIR}ORG/data/* ${DONKEYDIR}/data" 
 

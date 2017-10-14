@@ -1,20 +1,27 @@
 #!/bin/bash
 
+DONKEYDIR=d2
+
 if [ "$1" == "" ] ; then
-  echo The hostname parmeter DOES NOT exist
-  echo "Usage: script-remote-createcar <hostname.local>"
-  exit
+  SRCDIR=$(dirname $0)
+  source $SRCDIR/script-config
+  echo "using saved Donkeycar hostname:$myHostNameLocal"
 else
-  ping -c 1 $1
-  if [ ! $? == 0 ] ; then
-    echo $1 Not Found! 
-    echo Please recheck the spelling or verify both devices are on the same wireless network. 
-    exit
-  fi
+  myHostNameLocal=$1
 fi
+ping -c 1 $myHostNameLocal
+if [ ! $? == 0 ] ; then
+  echo $myHostNameLocal Not Found! 
+  echo Please recheck the spelling or verify both devices are on the same wireless network. 
+  echo "Usage: script-remote-createcar [hostname.local]"
+  exit
+fi
+
+echo 'PASSED - Parameter checks'
+
 
 #
 # create standard car using web interface for remote control
 CMD="donkey createcar --template donkey2 --path ~/d2 --overwrite"
 
-ssh pi@$1 -t "source /home/pi/env/bin/activate; $CMD" 
+ssh pi@$myHostNameLocal -t "source /home/pi/env/bin/activate; $CMD" 
