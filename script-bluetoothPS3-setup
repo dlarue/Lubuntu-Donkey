@@ -13,7 +13,7 @@ ping -c 1 $myHostNameLocal
 if [ ! $? == 0 ] ; then
   echo $myHostNameLocal Not Found! 
   echo Please recheck the spelling or verify both devices are on the same wireless network. 
-  echo "Usage: script-bluetoothPS3-final [your-hostname.local]"
+  echo "Usage: script-bluetoothPS3-setup [your-hostname.local]"
   exit
 fi
 
@@ -23,13 +23,14 @@ echo 'PASSED - Parameter checks'
 # TODO: add checks for customizations to Config.py and manage.py
 #
 # updating rPi Donkey software
+ssh pi@$myHostNameLocal -t "sudo apt-get install -qqy bluetooth libbluetooth3 libusb-dev; sudo usermod -G bluetooth -a pi; gcc -o sixpair sixpair.c -lusb; sudo systemctl enable bluetooth.service; sudo systemctl restart bluetooth; echo 'Halting! Remove/replace power and ssh into the rPi, then run the bluetoothctl commands'; sudo halt" 
+
+#from: https://pythonhosted.org/triangula/sixaxis.html
 echo "example:"
 echo "bluetoothctl"
 echo "  > plug in PS3 controller"
 echo "  > agent on"
 echo "  > trust ps3_device_mac_id"
 echo "  > quit"
-echo ""
-ssh pi@$myHostNameLocal -t "source env/bin/activate; echo 'Plug your PS3 Controller into the rPi via USB cable'; bluetoothctl ; ls /dev/input/" 
-
 exit 
+
