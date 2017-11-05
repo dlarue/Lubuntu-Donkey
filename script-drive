@@ -19,7 +19,4 @@ fi
 
 echo 'PASSED - Parameter checks'
 
-ssh pi@$myHostNameLocal -t "source /home/pi/env/bin/activate; cd; cd d2; python ./manage.py drive" 
-# 
-# for PS3 Joystick use
-#ssh pi@$myHostNameLocal -t "source /home/pi/env/bin/activate; python cd; cd d2; ./manage.py drive --js" 
+ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd; cd d2; python ./manage.py drive" 

@@ -5,9 +5,9 @@
 #
 LHOME=/home/lubuntu
 DOWNLOADS=/home/lubuntu/Downloads
-IMG=$HOME/Projects/DIYRoboCar/Donkey/donkey_2.img.zip
-IMG=donkey_2.img.zip
-IMGSRC=https://www.dropbox.com/s/vb9wlju4aqx7i5o/donkey_2.img.zip
+IMG=$HOME/Projects/DIYRoboCar/Donkey/donkey_2.2.img.zip
+IMG=donkey_2.2.img.zip
+IMGSRC=https://www.dropbox.com/s/vb9wlju4aqx7i5o/donkey_2.2.img.zip
 
 if [ ! -f $IMG ] ; then
   wget $IMGSRC

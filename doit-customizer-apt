@@ -6,7 +6,7 @@ apt-get update \
 apt-get install -qqy \
 	git wget pv virtualenv nmap avahi-utils
 apt-get install -qqy \
-	linux-firmware-nonfree b43-fwcutter firmware-b43-installer
+	b43-fwcutter firmware-b43-installer
 apt-get clean
 apt-get -qqy autoremove 
 

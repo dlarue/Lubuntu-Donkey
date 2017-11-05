@@ -1,1 +1,11 @@
 python manage.py analyze --op=histogram --rec="user/angle"
+
+
+donkey makemovie --config ~/d2b --tub ~d2b/data/tub_5_17-08-20/
+or
+cd ~/d2
+donkey makemovie --tub ./data/tub_5_17-08-20/
+
+
+# improve rPi Camera speed and reduce blurring:
+if anyone wants to try to take out/supress "image" blur, try adding this line to the initialize parts of the cameras.py file self.camera.exposure_mode = "sports" this is the picamera sports mode, in theory this mode could push the camera up to iso 1600 and thus keep very short exposure rates. I see noticeable improvements doing this.

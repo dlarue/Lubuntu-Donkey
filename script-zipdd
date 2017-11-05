@@ -36,7 +36,8 @@ echo 'Checking for previously mounted uSD'
 # checking for uSD card
 ls /dev/${SDDEVICE} > /dev/null 2>&1
 if [ $? == 0 ] ; then
-  if grep ${SDDEVICE} /etc/mtab > /dev/null 2>&1 ; then
+  grep ${SDDEVICE} /etc/mtab > /dev/null 2>&1
+  if [ $? == 0 ] ; then
     IS_MOUNTED=`df | grep ${SDDEVICE}`
     if [ $? == 0 ] ; then
       #echo 'test: $IS_MOUNTED'
@@ -44,7 +45,7 @@ if [ $? == 0 ] ; then
       if [ "${SDDEVICE}" == "mmcblk0" ] ; then
         sudo umount /dev/${SDDEVICE}p*
       else
-        sudo mount /dev/${SDDEVICE}*
+        sudo umount /dev/${SDDEVICE}*
       fi
       if [ ! $? == 0 ] ; then
         echo 'FAIL - Unable to unmount the uSD card'
@@ -83,7 +84,7 @@ echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
-IMAGE_SIZE=`unzip -l ~/Downloads/donkey_2.img.zip | grep donkey | tail -n 1 | cut -f1 -d" "`
+IMAGE_SIZE=`unzip -l $1 | grep donkey | tail -n 1 | cut -f1 -d" "`
 
 unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
 sync

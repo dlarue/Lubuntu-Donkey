@@ -10,6 +10,7 @@ if [ "$1" == "" ] ; then
 else
   myHostNameLocal=$1
 fi
+
 ping -c 1 $myHostNameLocal
 if [ ! $? == 0 ] ; then
   echo $myHostNameLocal Not Found! 
@@ -25,6 +26,14 @@ fi
 
 echo 'PASSED - Parameter checks'
 
+FOUNDSSID=`iwgetid -r`
+if [ "$FOUNDSSID" == "" ] ; then
+  FOUNDSSID="yourSSID"
+fi
+read -e -p "Enter Your WiFi SSID:" -i $FOUNDSSID MYSSID
+# set config entry mySSID for reference
+sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config
+
 #auto ssh login
 # This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
 echo "answer yes to Overwriting existing file"
@@ -32,3 +41,135 @@ ssh-keygen -f ~/.ssh/id_rsa -N ""
 #
 # Move id_rsa.pub to rPi, or use ssh-copy-id -i ~/.ssh/id_rsa pi@your-hostname.local 
 ssh-copy-id -i ~/.ssh/id_rsa pi@$myHostNameLocal
+
+exit
+
+#!/bin/bash
+
+BASEDIR=$(dirname $0)
+
+echo 'Checking for parameters'
+if [ "$1" == "" ] ; then
+  #echo :$1: parm DOES NOT exist
+  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  exit
+else
+  #echo :$1: parm exists
+  if [ -f $1 ] ; then
+    echo found $1
+  else
+    echo $1, file DOES NOT exist. Should be: filename.img.zip
+  fi
+fi
+
+if [ "$2" == "" ] ; then
+  echo 'FAIL - The Second parameter DOES NOT exist'
+  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  exit
+else
+  # set config entry myHostName for other scripts usage
+  sed -i s/myHostName=.*/myHostName=\"$2\"/g $BASEDIR/script-config
+fi
+if [ ! "$3" == "" ] ; then
+  echo 'USING Alternate Device '$3
+  SDDEVICE=$3
+else
+  SDDEVICE="mmcblk0"
+fi
+echo 'PASSED - Parameter check'
+
+echo 'Checking for previously mounted uSD'
+# checking for uSD card
+ls /dev/${SDDEVICE} > /dev/null 2>&1
+if [ $? == 0 ] ; then
+  grep ${SDDEVICE} /etc/mtab > /dev/null 2>&1
+  if [ $? == 0 ] ; then
+    IS_MOUNTED=`df | grep ${SDDEVICE}`
+    if [ $? == 0 ] ; then
+      #echo 'test: $IS_MOUNTED'
+      #echo 'test: unmounting partitions'
+      if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+        sudo umount /dev/${SDDEVICE}p*
+      else
+        sudo umount /dev/${SDDEVICE}*
+      fi
+      if [ ! $? == 0 ] ; then
+        echo 'FAIL - Unable to unmount the uSD card'
+        exit
+      fi
+    fi
+    echo 'PASSED - uSD unmounted check'
+  fi
+  echo 'PASSED - uSD check'
+else
+  echo 'FAIL - No uSD card found. Please insert and try again.'
+  exit
+fi
+
+echo You will now be prompted for your WiFi SSID and PassPhrase.
+echo These will be used to populate the wpa_supplicant.conf file in
+echo your Downloads directory and copied to /media/lubuntu/boot.
+echo On startup, the raspberryPi will copy that into the netwok and use it.
+echo -------------- Setting up WiFi --------------------------------------
+FOUNDSSID=`iwgetid -r`
+if [ "$FOUNDSSID" == "" ] ; then
+  FOUNDSSID="yourSSID"
+fi
+read -e -p "Enter Your WiFi SSID:" -i $FOUNDSSID MYSSID
+echo -n "Enter your WiFi Passphrase: "
+read MYPWD
+cp ~/Downloads/wpa_supplicant.conf ~/Downloads/wpa_supplicant.conf.NEW
+sed -i s/your-network-name/$MYSSID/g ~/Downloads/wpa_supplicant.conf.NEW
+sed -i s/your-passphrase/$MYPWD/g ~/Downloads/wpa_supplicant.conf.NEW
+#sed -i s/track/$2/g ~/Downloads/wpa_supplicant.conf.NEW
+
+# set config entry mySSID for reference
+sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config
+
+echo BUILDING your DonkeyCar image. Please Wait......
+echo NOTE!  Wait until copied data bufferes are flushed
+echo and you see COPY DONE before ejecting
+
+IMAGE_SIZE=`unzip -l $1 | grep donkey | tail -n 1 | cut -f1 -d" "`
+
+unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
+sync
+
+echo COPY DONE
+echo
+echo Setting up Customizations
+sudo partprobe # reloads partition tables
+
+mkdir mnt1 mnt2
+if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+  sudo mount /dev/${SDDEVICE}p1 mnt1
+  sudo mount /dev/${SDDEVICE}p2 mnt2
+else
+  sudo mount /dev/${SDDEVICE}1 mnt1
+  sudo mount /dev/${SDDEVICE}2 mnt2
+fi
+
+#echo Setting up new hostname
+echo $2 | sudo tee mnt2/etc/hostname
+sudo sed -i s/raspberrypi/$2/g mnt2/etc/hosts
+
+#sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt1/wpa_supplicant.conf
+sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt2/etc/wpa_supplicant/wpa_supplicant.conf
+sudo cp ~/Downloads/wlan0.conf mnt2/etc/network/interfaces.d/
+sudo cp ~/Downloads/sixpair.c mnt2/home/pi/
+
+#auto ssh login
+# This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+ssh-keygen -f ~/.ssh/id_rsa -N ""
+#
+# Move id_rsa.pub to rPi, or use ssh-copy-id -i ~/.ssh/id_rsa pi@your-hostname.local 
+sudo mkdir mnt2/home/pi/.ssh
+sudo mv ~/.ssh/id_rsa.pub mnt2/home/pi/.ssh/authorized_keys
+sudo chown -R 1000:1000 mnt2/home/pi/.ssh
+
+sudo sync && sudo umount mnt1 mnt2
+rm -rf mnt1 mnt2
+
+echo Remove the uSD card and install it in your DonkeyCar and power it up.
+echo You can now find it on this same WiFi network using $2.local or 
+echo using avahi-browse -at
