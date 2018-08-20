@@ -19,6 +19,14 @@ fi
 
 echo 'PASSED - Parameter checks'
 
+# trap ctrl-c and call ctrl_c()
+#trap ctrl_c INT
+#function ctrl_c() {
+#    echo "** Trapped CTRL-C"
+#    python led_steady_status.py 11 0
+#}
+#python led_steady_status.py 11 1
+
 #
 # for autonomous driving
-ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd d2; python ./manage.py drive --model=./models/myPilot" 
+ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd d2; python ./manage.py drive --model=./models/myPilots" 
