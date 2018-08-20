@@ -6,20 +6,31 @@ cd $DONKEYDIR
 if [ "$1" == "" ] ; then
   echo Training Tub parmeter DOES NOT exist.
   echo choose on of the following directories and try again.
-  echo "Usage: script-train [tub file]"
+  echo "Usage: script-train [tub file | all]"
   ls data
   exit
 else
   #echo :$1: parm exits
-  if [ -d ~/d2/data/$1 ] ; then
-    echo found $1
+  if [ $1 == "all" ] ; then
+    echo All Tubs
+    MYTUB="$DONKEYDIR/data/*"
   else
-    echo Training Tub directory DOES NOT exist.
-    echo choose on of the following directories and try again.
-    echo Usage: script-train [tub file]
-    ls data
-    exit
+    echo found $1
+    MYTUB=""
+    tubArray=$(echo $1 | tr "," "\n")
+    for X in $tubArray
+    do
+      MYTUB=$DONKEYDIR/data/$X,$MYTUB
+    done
+ # else
+ #   echo Training Tub directory DOES NOT exist.
+ #   echo choose on of the following directories and try again.
+ #   echo "Usage: script-train [tub file | all]"
+ #   ls data
+ #   exit
   fi
 fi
+echo 'PASSED - Parameter checks'
 
-python ./manage.py train --tub=$DONKEYDIR/data/$1 --model=$DONKEYDIR/models/myPilot
+
+python ./manage.py train --tub=$MYTUB  --model=$DONKEYDIR/models/myPilot

@@ -45,7 +45,7 @@ if [ $? == 0 ] ; then
       if [ "${SDDEVICE}" == "mmcblk0" ] ; then
         sudo umount /dev/${SDDEVICE}p*
       else
-        sudo umount /dev/${SDDEVICE}*
+        sudo umount /dev/${SDDEVICE}?
       fi
       if [ ! $? == 0 ] ; then
         echo 'FAIL - Unable to unmount the uSD card'

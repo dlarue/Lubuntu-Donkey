@@ -30,11 +30,23 @@ sudo cp timezone FileSystem/etc/timezone
 
 sudo mkdir FileSystem/$LHOME/bin
 sudo cp script-* FileSystem/$LHOME/bin
+sudo cp doit-cpu* FileSystem/$LHOME/bin
 sudo chmod +x FileSystem/$LHOME/bin/*
 
 sudo mkdir FileSystem/$LHOME/Documents
 sudo cp lubuntu-default-wallpaper.png FileSystem/$LHOME/Documents
+sudo cp tools.txt FileSystem/$LHOME/Documents/Donkey-tools-notes.txt
 sudo tar -xzf desktopConfig.tgz -C FileSystem/$LHOME
 
+sudo cp NetworkManager.conf FileSystem/etc/NetworkManager
+
+# installing Eric IDE
+# copy eric tgz to Downloads and extract
+# install QT5
+## source env, apt install python-qscintilla2, pip install PyQt5 qscintilla
+## apt clean
+## python ./install.py
+
 sudo chown -R 999:999 FileSystem/home/lubuntu
+sudo chown -R 999:999 FileSystem/home/lubuntu/donkeycar/.git/*
 

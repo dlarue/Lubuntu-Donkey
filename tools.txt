@@ -1,3 +1,7 @@
+#
+# various clips and fragments regarding handy tools to help with the Donkey NN
+#
+
 python manage.py analyze --op=histogram --rec="user/angle"
 
 
@@ -5,6 +9,17 @@ donkey makemovie --config ~/d2b --tub ~d2b/data/tub_5_17-08-20/
 or
 cd ~/d2
 donkey makemovie --tub ./data/tub_5_17-08-20/
+
+donkey tubclean <data dir>
+#Starts a HTML/web interface to edit and "clean" the tub data
+
+Generate historgram of the steering angle:
+sudo apt install python3-matplotlib
+pip3 install matplotlib
+donkey tubhist ~/d2/data/tub_4_17-11-18 --rec="user/angle"
+
+Plot how the model fits the original data with:
+donkey tubplot --tub <data> --model <model>
 
 
 # improve rPi Camera speed and reduce blurring:
@@ -19,3 +34,8 @@ Start the simulator server using mySimPilot
 donkey sim --model=models/mySimPilot
 Start the simulaotr, pick a scene and then select the NN Steering w Websockets option
 
+
+# to see the PS3 Controller battery level:
+cat /sys/class/power_supply/sony_controller_battery_00\:21\:4f\:07\:24\:4d/capacity 
+upower -e
+upower -i /org/freedesktop/UPower/devices/keyboard_sony_controller_battery_00o21o4fo07o24o4d

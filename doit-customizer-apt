@@ -4,7 +4,7 @@
 apt-get update \
 	&& apt-get -qqy upgrade 
 apt-get install -qqy \
-	git wget pv virtualenv nmap avahi-utils
+	git wget pv virtualenv nmap avahi-utils net-tools cpufrequtils
 apt-get install -qqy \
 	b43-fwcutter firmware-b43-installer
 apt-get clean
@@ -24,7 +24,8 @@ mkdir /home/lubuntu/Downloads
 cd /home/lubuntu
 virtualenv env -p python3
 source env/bin/activate
-git clone https://github.com/wroscoe/donkey donkeycar
+#git clone https://github.com/wroscoe/donkey donkeycar
+git clone https://github.com/tawnkramer/donkey donkeycar
 pip install -e donkeycar
 #pip install Keras==2.0.6
 #pip install tensorflow==1.1.0
