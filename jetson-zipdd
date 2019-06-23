@@ -1,0 +1,162 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)
+
+echo 'Checking for parameters'
+if [ "$1" == "" ] ; then
+  #echo :$1: parm DOES NOT exist
+  echo "Usage: script-zipdd <jetson zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  exit
+else
+  #echo :$1: parm exists
+  if [ -f $1 ] ; then
+    echo found $1
+  else
+    echo $1, file DOES NOT exist. Should be: filename.img.zip
+  fi
+fi
+
+if [ "$2" == "" ] ; then
+  echo 'FAIL - The Second parameter DOES NOT exist'
+  echo "Usage: script-zipdd <jetson zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  exit
+else
+  # set config entry myHostName for other scripts usage
+  echo ""
+  #sed -i s/myHostName=.*/myHostName=\"$2\"/g $BASEDIR/script-config
+fi
+if [ ! "$3" == "" ] ; then
+  echo 'USING Alternate Device '$3
+  SDDEVICE=$3
+else
+  SDDEVICE="mmcblk0"
+fi
+echo 'PASSED - Parameter check'
+
+echo 'Checking for previously mounted uSD'
+# checking for uSD card
+ls /dev/${SDDEVICE} > /dev/null 2>&1
+if [ $? == 0 ] ; then
+  grep ${SDDEVICE} /etc/mtab > /dev/null 2>&1
+  if [ $? == 0 ] ; then
+    IS_MOUNTED=`df | grep ${SDDEVICE}`
+    if [ $? == 0 ] ; then
+      #echo 'test: $IS_MOUNTED'
+      #echo 'test: unmounting partitions'
+      if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+        sudo umount /dev/${SDDEVICE}p*
+      else
+        sudo umount /dev/${SDDEVICE}?
+      fi
+      if [ ! $? == 0 ] ; then
+        echo 'FAIL - Unable to unmount the uSD card'
+        exit
+      fi
+    fi
+    echo 'PASSED - uSD unmounted check'
+  fi
+  echo 'PASSED - uSD check'
+else
+  echo 'FAIL - No uSD card found. Please insert and try again.'
+  exit
+fi
+
+echo You will now be prompted for your WiFi SSID and PassPhrase.
+echo These will be used to populate the wpa_supplicant.conf file in
+echo your Downloads directory and copied to /media/lubuntu/boot.
+echo On startup, the raspberryPi will copy that into the netwok and use it.
+echo -------------- Setting up WiFi --------------------------------------
+FOUNDSSID=`iwgetid -r`
+if [ "$FOUNDSSID" == "" ] ; then
+  FOUNDSSID="yourSSID"
+fi
+read -e -p "Enter Your WiFi SSID:" -i $FOUNDSSID MYSSID
+echo -n "Enter your WiFi Passphrase: "
+read MYPWD
+cp ./wpa_supplicant.conf ./wpa_supplicant.conf.NEW
+sed -i s/your-network-name/$MYSSID/g ./wpa_supplicant.conf.NEW
+sed -i s/your-passphrase/$MYPWD/g ./wpa_supplicant.conf.NEW
+#sed -i s/track/$2/g ./wpa_supplicant.conf.NEW
+
+# set config entry mySSID for reference
+#sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config
+
+echo BUILDING your DonkeyCar image. Please Wait......
+echo NOTE!  Wait until copied data bufferes are flushed
+echo and you see COPY DONE before ejecting
+
+IMAGE_SIZE=`unzip -l $1 | grep jetson | tail -n 1 | cut -f1 -d" "`
+#IMAGE_SIZE="3500000"
+
+unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
+#xz -cd $1 | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
+sync
+
+echo COPY DONE
+echo
+echo Setting up Customizations
+sudo partprobe # reloads partition tables
+
+mkdir mnt1 
+if [ "${SDDEVICE}" == "mmcblk0" ] ; then
+  sudo mount /dev/${SDDEVICE}p1 mnt1
+else
+  sudo mount /dev/${SDDEVICE}1 mnt1
+fi
+
+echo "Setting up: new hostname"
+echo $2 | sudo tee mnt1/etc/hostname
+sudo sed -i s/jetson/$2/g mnt1/etc/hosts
+
+# setup networking
+echo "Setting up: WiFi networking"
+sudo mv ./wpa_supplicant.conf.NEW mnt1/etc/wpa_supplicant/wpa_supplicant.conf
+printf '# interfaces(5) file used by ifup(8) and ifdown(8)
+auto wlan0
+iface wlan0 inet dhcp
+wpa-driver wext
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' | sudo tee mnt1/etc/network/interfaces
+
+#auto ssh login
+echo "Setting up: auto ssh login"
+# This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+ssh-keygen -f ~/.ssh/id_rsa -N ""
+#
+# Move id_rsa.pub to rPi, or use ssh-copy-id -i ~/.ssh/id_rsa jetson@your-hostname.local 
+sudo mkdir mnt1/home/jetson
+sudo mkdir mnt1/home/jetson/.ssh
+sudo mv ~/.ssh/id_rsa.pub mnt1/home/jetson/.ssh/authorized_keys
+sudo chown -R 1000:1000 mnt1/home/jetson/.ssh
+
+# setup timezone
+#
+echo "Setting up: timezone"
+HERE=$PWD
+cd mnt1/etc
+sudo rm -rf localtime
+sudo ln -s /usr/share/zoneinfo/America/Los_Angeles localtime
+cd $HERE
+#sudo ln -s mnt1/usr/share/zoneinfo/America/Los_Angeles mnt1/etc/localtime
+echo "America/Los_Angeles" | sudo tee mnt1/etc/timezone
+
+# setup user
+#
+echo "Setting up: user"
+echo "userID=jetson password=jetson"
+echo "jetson:x:1000:1000:,,,:/home/jetson:/bin/bash" | sudo tee -a mnt1/etc/passwd
+echo "jetson:\$6\$ZHshlII/\$IWLSy3Duq.my2MoDNGQZupOee0hYTezYoa/YoAT7ItWqPtCD8/0ow9u1zLAriItHJD0NNf2lVvSSu5/RhI0QI.:18070:0:99999:7:::" | sudo tee -a mnt1/etc/shadow
+echo "jetson:x:1000:" | sudo tee -a mnt1/etc/group
+sudo sed -i s/dialout:x:20:.*/dialout:x:20:jetson/g mnt1/etc/group
+sudo sed -i s/sudo:x:27:.*/sudo:x:27:jetson/g mnt1/etc/group
+
+# fix boot to drop to runlevel 3
+#
+echo "Setting up: extlinux.conf
+sudo sed -i 's/APPEND.*/& 3/g' mnt1/boot/extlinux/extlinux.conf
+
+sudo sync && sudo umount mnt1
+rm -rf mnt1 
+
+echo Remove the uSD card and install it in your DonkeyCar and power it up.
+echo You can now find it on this same WiFi network using $2.local or 
+echo using avahi-browse -at
