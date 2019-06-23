@@ -23,5 +23,5 @@ echo 'PASSED - Parameter checks'
 # TODO: add checks for customizations to Config.py and manage.py
 #
 # updating rPi Donkey software
-ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd; if [ -d ${DONKEYDIR}ORG ]; then rm -rf ${DONKEYDIR}ORG; fi; mv ${DONKEYDIR} ${DONKEYDIR}ORG ; donkey createcar --path=${DONKEYDIR} && mv ${DONKEYDIR}ORG/models/* ${DONKEYDIR}/models && mv ${DONKEYDIR}ORG/data/* ${DONKEYDIR}/data" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; donkey createcar --path=${DONKEYDIR} --overwrite" 
 

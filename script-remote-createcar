@@ -24,4 +24,4 @@ echo 'PASSED - Parameter checks'
 # create standard car using web interface for remote control
 CMD="donkey createcar --template donkey2 --path ~/d2 --overwrite"
 
-ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; $CMD" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; $CMD" 

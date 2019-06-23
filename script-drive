@@ -19,4 +19,4 @@ fi
 
 echo 'PASSED - Parameter checks'
 
-ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd; cd d2; python ./manage.py drive" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; cd d2; python ./manage.py drive" 

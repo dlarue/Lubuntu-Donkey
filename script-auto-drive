@@ -29,4 +29,4 @@ echo 'PASSED - Parameter checks'
 
 #
 # for autonomous driving
-ssh pi@$myHostNameLocal -t "source /usr/local/bin/virtualenvwrapper.sh;workon dk; cd d2; python ./manage.py drive --model=./models/myPilots" 
+ssh pi@$myHostNameLocal -t "source env/bin/activate; cd d2; python ./manage.py drive --model=./models/myPilot.json" 

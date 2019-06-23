@@ -25,7 +25,7 @@ else
   sed -i s/myHostName=.*/myHostName=\"$2\"/g $BASEDIR/script-config
 fi
 if [ ! "$3" == "" ] ; then
-  echo 'USING Alternate Device '$3
+  echo 'USING Alternate Device /dev/'$3
   SDDEVICE=$3
 else
   SDDEVICE="mmcblk0"
@@ -57,6 +57,7 @@ if [ $? == 0 ] ; then
   echo 'PASSED - uSD check'
 else
   echo 'FAIL - No uSD card found. Please insert and try again.'
+  echo 'searched for:/dev/'${SDDEVICE}
   exit
 fi
 
@@ -113,6 +114,7 @@ sudo sed -i s/raspberrypi/$2/g mnt2/etc/hosts
 sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt2/etc/wpa_supplicant/wpa_supplicant.conf
 sudo cp ~/Downloads/wlan0.conf mnt2/etc/network/interfaces.d/
 sudo cp ~/Downloads/sixpair.c mnt2/home/pi/
+sudo cp ~/Downloads/do-autohotspot.tgz mnt2/home/pi/
 
 #auto ssh login
 # This generates 2 files, ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
@@ -122,6 +124,10 @@ ssh-keygen -f ~/.ssh/id_rsa -N ""
 sudo mkdir mnt2/home/pi/.ssh
 sudo mv ~/.ssh/id_rsa.pub mnt2/home/pi/.ssh/authorized_keys
 sudo chown -R 1000:1000 mnt2/home/pi/.ssh
+sudo rm -rf mnt2/etc/localtime 
+sudo cp mnt2/usr/share/zoneinfo/America/Los_Angeles mnt2/etc/localtime 
+sudo echo "America/Los_Angeles" | sudo tee mnt2/etc/timezone
+
 
 sudo sync && sudo umount mnt1 mnt2
 rm -rf mnt1 mnt2

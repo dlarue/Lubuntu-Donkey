@@ -11,25 +11,29 @@ else
   myHostNameLocal=$1
 fi
 
+echo -------------- Setup hostname in script-config --------------------------------------
 ping -c 1 $myHostNameLocal
 if [ ! $? == 0 ] ; then
   echo $myHostNameLocal Not Found! 
-  FOUNDHOSTNAME=$myHostName
-  read -e -p "Enter Your rPi Hostname:" -i $FOUNDHOSTNAME MYHOSTNAME
-
-  # set config entry myHostName for other scripts usage
-  sed -i s/myHostName=.*/myHostName=\"$MYHOSTNAME\"/g $BASEDIR/script-config
-  source $SRCDIR/script-config
-  #echo "Usage: script-reauthorize-ssh [hostname.local]"
-  #exit
+  myHostNameLocal="your-hostname.local"
 fi
+FOUNDHOSTNAME=`basename $myHostNameLocal .local`
+read -e -p "Enter Your rPi Hostname:" -i $FOUNDHOSTNAME MYHOSTNAME
+sed -i s/myHostName=.*/myHostName=\"$2\"/g $BASEDIR/script-config
+
+# set config entry myHostName for other scripts usage
+sed -i s/myHostName=.*/myHostName=\"$MYHOSTNAME\"/g $BASEDIR/script-config
+source $SRCDIR/script-config
+#echo "Usage: script-reauthorize-ssh [hostname.local]"
+#exit
 
 echo 'PASSED - Parameter checks'
-
+echo -------------- Setup WiFi in script-config --------------------------------------
 FOUNDSSID=`iwgetid -r`
 if [ "$FOUNDSSID" == "" ] ; then
   FOUNDSSID="yourSSID"
 fi
+
 read -e -p "Enter Your WiFi SSID:" -i $FOUNDSSID MYSSID
 # set config entry mySSID for reference
 sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config

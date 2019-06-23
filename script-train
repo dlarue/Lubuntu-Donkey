@@ -22,6 +22,7 @@ else
     do
       MYTUB=$DONKEYDIR/data/$X,$MYTUB
     done
+    MYTUB=$DONKEYDIR/data/$1
  # else
  #   echo Training Tub directory DOES NOT exist.
  #   echo choose on of the following directories and try again.
@@ -33,4 +34,4 @@ fi
 echo 'PASSED - Parameter checks'
 
 
-python ./manage.py train --tub=$MYTUB  --model=$DONKEYDIR/models/myPilot
+python ./manage.py train --tub=$MYTUB  --model=$DONKEYDIR/models/myPilot.h5
