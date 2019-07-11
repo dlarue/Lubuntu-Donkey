@@ -126,7 +126,7 @@ ssh-keygen -f ~/.ssh/id_rsa -N ""
 sudo mkdir mnt1/home/jetson
 sudo mkdir mnt1/home/jetson/.ssh
 sudo mv ~/.ssh/id_rsa.pub mnt1/home/jetson/.ssh/authorized_keys
-sudo chown -R 1000:1000 mnt1/home/jetson/.ssh
+sudo chown -R 1000:1000 mnt1/home/jetson
 
 # setup timezone
 #
