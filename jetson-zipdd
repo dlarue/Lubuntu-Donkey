@@ -85,7 +85,7 @@ echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
-IMAGE_SIZE=`unzip -l $1 | grep jetson | tail -n 1 | cut -f1 -d" "`
+IMAGE_SIZE=`unzip -l $1 | grep .img | tail -n 1 | cut -f1 -d" "`
 #IMAGE_SIZE="3500000"
 
 unzip -p $1 *.img | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
@@ -151,7 +151,7 @@ sudo sed -i s/sudo:x:27:.*/sudo:x:27:jetson/g mnt1/etc/group
 
 # fix boot to drop to runlevel 3
 #
-echo "Setting up: extlinux.conf
+echo "Setting up: extlinux.conf"
 sudo sed -i 's/APPEND.*/& 3/g' mnt1/boot/extlinux/extlinux.conf
 
 sudo sync && sudo umount mnt1
