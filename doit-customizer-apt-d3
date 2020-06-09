@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#NOTE:
+#copy this file to FILESYSTEM/root
+#run terminal in customizer-gui
+#execute this script from /root
+
+apt-get update \
+	&& apt-get -qqy upgrade 
+apt-get install -qqy \
+	git wget pv virtualenv nmap avahi-utils net-tools cpufrequtils
+apt-get install -qqy \
+	b43-fwcutter firmware-b43-installer
+apt-get clean
+apt-get -qqy autoremove 
+
+#
+# setup timezone
+#
+rm -rf /etc/localtime
+ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime 
+
+#
+# install donkey as donkeycar
+#
+mkdir /home/lubuntu
+mkdir /home/lubuntu/Downloads
+cd /home/lubuntu
+cp /etc/skel/.bashrc /home/lubuntu/
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ./Miniconda3-latest-Linux-x86_64.sh
+source /home/lubuntu/.bashrc
+
+git clone https://github.com/autorope/donkeycar
+cd donkeycar
+git checkout master
+
+conda env create -f install/envs/ubuntu.yml
+conda activate donkey
+pip install -e .[pc]
+conda install tensorflow-gpu==1.13.1
+
+cd /home/lubuntu
+apt install curl
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
+apt update
+apt install edgetpu
+
+apt-get clean
+
+git clone https://github.com/tawnkramer/donkey_gym
+donkey createcar --path /home/lubuntu/d3_1
+sed -i s/DONKEY_GYM.*/"DONKEY_GYM = True"/ d3_1/config.py
+sed -i s/DONKEY_SIM_PATH.*/'DONKEY_SIM_PATH = "\/home\/lubuntu\/DonkeySimLinux\/donkey_sim.x86_64"'/ d3_1/config.py
+sed -i s/USE_JOYSTICK_AS_DEFAULT.*/"USE_JOYSTICK_AS_DEFAULT = True"/ d3_1/config.py
+
+conda clean --all
+
+chown -R 999:999 /home/lubuntu
+

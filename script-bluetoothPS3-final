@@ -30,6 +30,6 @@ echo "  > agent on"
 echo "  > trust ps3_device_mac_id"
 echo "  > quit"
 echo ""
-ssh pi@$myHostNameLocal -t "echo 'Plug your PS3 Controller into the rPi via USB cable'; sudo ./sixpair ; bluetoothctl ; ls /dev/input/" 
+ssh pi@$myHostNameLocal -t "echo 'Plug your PS3 Controller into the rPi via USB cable'; bluetoothctl ; ls /dev/input/" 
 
 exit 

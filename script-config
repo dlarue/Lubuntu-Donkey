@@ -1,5 +1,5 @@
 
 #THE NEXT LINE, IT IS USED BY ALL SCRIPTS except for zipdd which sets it
-myHostName="your-hostname"
+myHostName="yourname-robocars"
 myHostNameLocal=$myHostName.local
 mySSID="SD-DIYRoboCar"

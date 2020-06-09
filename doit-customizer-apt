@@ -29,8 +29,19 @@ git clone https://github.com/tawnkramer/donkey donkeycar
 pip install -e donkeycar
 #pip install Keras==2.0.6
 #pip install tensorflow==1.1.0
-pip install Keras
-pip install tensorflow
+#pip install Keras
+#pip install tensorflow
+pip install Keras==2.2.2
+pip install tensorflow==1.10.0
+pip install sklearn
+pip install matplotlib
+sudo apt -qqy install python3-matplotlib
+sudo apt-get clean
+
+git clone https://github.com/tawnkramer/donkey_gym
+donkey createcar --path /home/lubuntu/d2
+sed -i s/DONKEY_GYM.*/"DONKEY_GYM = True"/ d2/config.py
+sed -i s/DONKEY_SIM_PATH.*/'DONKEY_SIM_PATH = "\/home\/lubuntu\/DonkeySimLinux\/donkey_sim.x86_64"'/ d2/config.py
 
 
 sudo chown -R 999:999 /home/lubuntu

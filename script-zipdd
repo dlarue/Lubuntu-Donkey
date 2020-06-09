@@ -85,8 +85,8 @@ echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
-IMAGE_SIZE=`unzip -l $1 | grep donkey | tail -n 1 | cut -f1 -d" "`
-string=`unzip -l $1 | grep donkey | tail -n 1`
+IMAGE_SIZE=`unzip -l $1 | grep "donkey\|raspbian" | tail -n 1 | cut -f1 -d" "`
+string=`unzip -l $1 | grep "donkey\|raspbian" | tail -n 1`
 DONKEY_IMAGE=`echo $string | cut -f4 -d" "`
 
 unzip -p $1 $DONKEY_IMAGE | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M

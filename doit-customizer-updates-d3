@@ -14,7 +14,7 @@ if [ ! -f $IMG ] ; then
   cp $IMGSRC .
 fi
 sudo mv $IMG FileSystem/$DOWNLOADS
-sudo cp bashrc FileSystem/$LHOME/.bashrc
+sudo cp bashrc-d3 FileSystem/$LHOME/.bashrc
 sudo cp wpa_supplicant.conf FileSystem/$DOWNLOADS
 sudo cp wlan0.conf FileSystem/$DOWNLOADS
 sudo cp sixpair.c FileSystem/$DOWNLOADS
@@ -31,7 +31,7 @@ sudo cp timezone FileSystem/etc/timezone
 #timedatectl set-timezone "America/Los_Angeles"
 
 sudo mkdir FileSystem/$LHOME/bin
-sudo cp script-* FileSystem/$LHOME/bin
+sudo cp D3-Scripts/script-* FileSystem/$LHOME/bin
 sudo cp doit-cpu* FileSystem/$LHOME/bin
 sudo chmod +x FileSystem/$LHOME/bin/*
 
