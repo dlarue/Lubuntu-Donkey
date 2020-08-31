@@ -85,8 +85,8 @@ echo BUILDING your DonkeyCar image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
-IMAGE_SIZE=`unzip -l $1 | grep "donkey\|raspbian" | tail -n 1 | cut -f1 -d" "`
-string=`unzip -l $1 | grep "donkey\|raspbian" | tail -n 1`
+IMAGE_SIZE=`unzip -l $1 | grep "donkey\|raspbian\|raspios" | tail -n 1 | cut -f1 -d" "`
+string=`unzip -l $1 | grep "donkey\|raspbian\|raspios" | tail -n 1`
 DONKEY_IMAGE=`echo $string | cut -f4 -d" "`
 
 unzip -p $1 $DONKEY_IMAGE | pv -s $IMAGE_SIZE | sudo dd of=/dev/${SDDEVICE} bs=1M
@@ -112,6 +112,7 @@ sudo sed -i s/raspberrypi/$2/g mnt2/etc/hosts
 
 #sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt1/wpa_supplicant.conf
 sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt2/etc/wpa_supplicant/wpa_supplicant.conf
+sudo cp ~/Downloads/wpa_supplicant.conf.NEW mnt1/wpa_supplicant.conf
 sudo cp ~/Downloads/wlan0.conf mnt2/etc/network/interfaces.d/
 sudo cp ~/Downloads/sixpair.c mnt2/home/pi/
 sudo cp ~/Downloads/do-autohotspot.tgz mnt2/home/pi/
@@ -127,6 +128,8 @@ sudo chown -R 1000:1000 mnt2/home/pi/.ssh
 sudo rm -rf mnt2/etc/localtime 
 sudo cp mnt2/usr/share/zoneinfo/America/Los_Angeles mnt2/etc/localtime 
 sudo echo "America/Los_Angeles" | sudo tee mnt2/etc/timezone
+sudo touch mnt1/ssh
+sudo chown -R 1000:1000 mnt2/home/pi/.
 
 
 sudo sync && sudo umount mnt1 mnt2
