@@ -5,7 +5,7 @@ BASEDIR=$(dirname $0)
 echo 'Checking for parameters'
 if [ "$1" == "" ] ; then
   #echo :$1: parm DOES NOT exist
-  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  echo "Usage: script-zipdd <OS image zip file> <Your_SBC_Hostname> [device/sdb]"
   exit
 else
   #echo :$1: parm exists
@@ -18,7 +18,7 @@ fi
 
 if [ "$2" == "" ] ; then
   echo 'FAIL - The Second parameter DOES NOT exist'
-  echo "Usage: script-zipdd <donkey zip file> <Your_Donkeycar_Hostname> [device/sdb]"
+  echo "Usage: script-zipdd <OS image zip file> <Your_SBC_Hostname> [device/sdb]"
   exit
 else
   # set config entry myHostName for other scripts usage
@@ -81,7 +81,7 @@ sed -i s/your-passphrase/$MYPWD/g ~/Downloads/wpa_supplicant.conf.NEW
 # set config entry mySSID for reference
 sed -i s/mySSID=.*/mySSID=\"$MYSSID\"/g $BASEDIR/script-config
 
-echo BUILDING your DonkeyCar image. Please Wait......
+echo BUILDING your SBC image. Please Wait......
 echo NOTE!  Wait until copied data bufferes are flushed
 echo and you see COPY DONE before ejecting
 
@@ -135,6 +135,6 @@ sudo chown -R 1000:1000 mnt2/home/pi/.
 sudo sync && sudo umount mnt1 mnt2
 rm -rf mnt1 mnt2
 
-echo Remove the uSD card and install it in your DonkeyCar and power it up.
+echo Remove the uSD card and install it in your SBC(single board computer) and power it up.
 echo You can now find it on this same WiFi network using $2.local or 
 echo using avahi-browse -at
